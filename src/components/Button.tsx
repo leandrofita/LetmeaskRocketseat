@@ -1,13 +1,11 @@
-import { useState } from "react";
+import { ButtonHTMLAttributes } from "react";
+import '../styles/button.scss';
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>
+//utilizando o ButtonHTMLAttributes para passar para o componente botão todas as propriedades que um botão HTML possui.
 
-export function Button() {
-    const [counter, setCounter] = useState(0)
-
-    function increment() {
-        setCounter(counter + 1); // O counter não é alterado, somente tem o seu valor alterado
-        console.log(counter)
-    }
+export function Button(props: ButtonProps) {
+    //o spread operator está redistribuindo todas as props recebidas para o componente abaixo
     return (
-        <button onClick={increment}>{counter}</button>
+        <button className="button" {...props}/>
     )
 };
