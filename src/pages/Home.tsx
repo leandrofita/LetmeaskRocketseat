@@ -4,8 +4,26 @@ import googleIconImg from "../assets/images/google-icon.svg";
 
 import "../styles/auth.scss";
 import { Button } from "../components/Button";
+import { useNavigate } from "react-router-dom";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../services/firebase";
 
 export function Home() {
+  const authh = getAuth();
+  const provider = new GoogleAuthProvider();
+  const navigate = useNavigate();
+
+  const handleCreateRoom = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      console.log("Cliquei google");
+      console.log(result);
+      navigate("/rooms/new")
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <div id="page-auth">
       <aside>
@@ -19,7 +37,12 @@ export function Home() {
       <main>
         <div className="main-content">
           <img src={logoImg} alt="" />
-          <button className="create-room">
+          <button
+            className="create-room"
+            onClick={() => {
+              handleCreateRoom();
+            }}
+          >
             <img src={googleIconImg} alt="Logo do Google"></img>
             Crie sua sala com o Google
           </button>
@@ -27,7 +50,6 @@ export function Home() {
           <form>
             <input type="text" placeholder="Digite o código da sala" />
             <Button type="submit">Entrar na sala</Button>
-            
           </form>
         </div>
       </main>
