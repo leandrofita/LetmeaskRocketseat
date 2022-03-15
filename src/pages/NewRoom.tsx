@@ -1,6 +1,6 @@
 import illustrationImg from "../assets/images/illustration.svg";
 import logoImg from "../assets/images/logo.svg";
-import {Link} from 'react-router-dom';
+import {Link,  useNavigate} from 'react-router-dom';
 import { FormEvent, useState } from "react";
 
 import "../styles/auth.scss";
@@ -11,6 +11,8 @@ import { database } from "../services/firebase";
 import { ref, set, push } from "firebase/database";
 
 export function NewRoom() {
+
+  const navigate = useNavigate()
 
   const [newRoom, setNewRoom] = useState('');
 
@@ -23,13 +25,16 @@ export function NewRoom() {
       return;
     }
     //Método para salvar uma lista de salas no Firebase
+    // ref: https://firebase.google.com/docs/database/web/lists-of-data?hl=pt-br
     const roomsRef = ref(database, 'rooms');
     const newRoomsRef = push(roomsRef);
      set(newRoomsRef, {
       title: newRoom,
       authorId: user?.id
     })
-
+    //redireciona o user para a sala criada
+    navigate(`/rooms/new/${newRoomsRef.key}`);
+    
   }
 
   
