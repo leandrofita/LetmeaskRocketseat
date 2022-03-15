@@ -33,7 +33,7 @@ export function NewRoom() {
       authorId: user?.id
     })
     //redireciona o user para a sala criada
-    navigate(`/rooms/new/${newRoomsRef.key}`);
+    navigate(`/rooms/${newRoomsRef.key}`);
     
   }
 
