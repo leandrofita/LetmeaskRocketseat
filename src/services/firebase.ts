@@ -30,4 +30,4 @@ const firebaseConfig = {
   const auth = getAuth(app);
   const database = getFirestore(app);
 
-  export { auth, database};
+  export { auth, database, app};

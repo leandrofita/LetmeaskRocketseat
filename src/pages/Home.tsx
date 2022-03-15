@@ -5,23 +5,23 @@ import googleIconImg from "../assets/images/google-icon.svg";
 import "../styles/auth.scss";
 import { Button } from "../components/Button";
 import { useNavigate } from "react-router-dom";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "../services/firebase";
+
+
+import { AuthContext } from "../App";
+import { useContext } from "react";
 
 export function Home() {
-  const authh = getAuth();
-  const provider = new GoogleAuthProvider();
+
+  const { user, signInWithGoogle } = useContext(AuthContext)
+
   const navigate = useNavigate();
+  
 
   const handleCreateRoom = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      console.log("Cliquei google");
-      console.log(result);
-      navigate("/rooms/new")
-    } catch (error) {
-      console.log(error);
+    if (!user){
+      await signInWithGoogle()
     }
+    navigate("/rooms/new")   
   };
 
   return (
