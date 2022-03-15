@@ -8,7 +8,7 @@ import { Button } from "../components/Button";
 
 import { useAuth } from "../hooks/useAuth";
 import { database } from "../services/firebase";
-import { ref, set } from "firebase/database";
+import { ref, set, push } from "firebase/database";
 
 export function NewRoom() {
 
@@ -22,8 +22,10 @@ export function NewRoom() {
     if(newRoom.trim() === ''){
       return;
     }
-    
-    set(ref(database, 'rooms'), {
+    //Método para salvar uma lista de salas no Firebase
+    const roomsRef = ref(database, 'rooms');
+    const newRoomsRef = push(roomsRef);
+     set(newRoomsRef, {
       title: newRoom,
       authorId: user?.id
     })
