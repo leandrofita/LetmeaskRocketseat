@@ -33,6 +33,7 @@ export function Home() {
       return;
     }
 
+    //método para buscar uma sala por ID no firebase
     const roomRef = ref(database);
     get(child(roomRef, `rooms/${roomCode}`)).then((snapshot) => {
       if (snapshot.exists()) {

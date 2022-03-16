@@ -5,17 +5,75 @@ import { Button } from "../components/Button";
 import { RoomCode } from "../components/RoomCode";
 import { useAuth } from "../hooks/useAuth";
 import "../styles/room.scss";
-import { ref, set, push } from "firebase/database";
+import { ref, set, push, get, child, onValue } from "firebase/database";
 import { database } from "../services/firebase";
 
 type RoomParams = {
   id: string;
 };
 
+type FireBaseQuestions = Record<string, {
+    author: {
+    avatar: string;
+    name: string;
+    }
+    content: string;
+    isAnswered: boolean;
+    isHighLighted: boolean;    
+}>
+
+type Question = {
+    id: string;
+    author: {
+        avatar: string;
+        name: string;
+        }
+        content: string;
+        isAnswered: boolean;
+        isHighLighted: boolean;
+
+}
+
 export function Room() {
   const [roomId, setRoomId] = useState("");
   const [newQuestion, setNewQuestion] = useState("");
   const { user } = useAuth();
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [title, setTitle] = useState('');
+
+  
+  // foi necessário virificar antes de o id da sala não é nulo por causa do typescript
+  //o useEffect atualizará a sala sempre que o ID for modificado manualmente
+  useEffect(() => {
+    if (params.id) {
+      setRoomId(params.id);
+      console.log(roomId);
+    }
+    return;
+  }, [roomId]);
+
+  useEffect(() => {
+      // método para ler dados uma vez com um observador
+         
+     return onValue(ref(database, `rooms/${roomId}`), (snapshot) => {
+        const room = (snapshot.val()) || 'Anonymous';
+        const fireBaseQuestions: FireBaseQuestions = room.questions;
+        console.log("Firebasequestions: ", fireBaseQuestions);
+        //transformar o objeto recebido em array
+        const parsedQuestions = Object.entries(fireBaseQuestions).map(([key, value]) => {
+            return {
+                id: key,
+                content: value.content,
+                author: value.author,
+                isHighLighted: value.isHighLighted,
+                isAnswered: value.isAnswered
+            }
+        })
+        setTitle(room.title);
+        setQuestions(parsedQuestions);
+      });
+         
+  }, [])
 
   //recebndo o id da sal através da URL
   const params = useParams<RoomParams>();
@@ -29,7 +87,7 @@ export function Room() {
       throw new Error("You must be logged in");
     }
 
-    const question = {
+   /*  const question = {
       content: newQuestion,
       author: {
         name: user?.name,
@@ -37,25 +95,24 @@ export function Room() {
       },
       isHighLighted: false,
       isAnswered: false,
-    };
+    }; */
+
     //métodos do firebase para slavar uma lista de perguntas
    const questionRef = ref(database, `rooms/${roomId}/questions`);
    const newQuestionRef = push(questionRef);
      set(newQuestionRef, {
-         question      
+        content: newQuestion,
+        author: {
+          name: user?.name,
+          avatar: user.avatar,
+        },
+        isHighLighted: false,
+        isAnswered: false,    
     })
     //limpando a textarea
     setNewQuestion('');
   }
 
-  // foi necessário virificar antes de o id da sala não é nulo por causa do typescript
-  useEffect(() => {
-    if (params.id) {
-      setRoomId(params.id);
-      console.log(roomId);
-    }
-    return;
-  }, []);
 
   return (
     <div id="page-room">
@@ -68,8 +125,8 @@ export function Room() {
 
       <main>
         <div className="room-title">
-          <h1>Sala react</h1>
-          <span>4 perguntas</span>
+          <h1>Sala {title}</h1>
+          {questions.length > 0 && <span>{questions.length} pergunta(s)</span>}
         </div>
 
         <form onSubmit={handleSendQuestion}>
@@ -80,12 +137,19 @@ export function Room() {
           />
 
           <div className="form-footer">
-            <span>
-              Para enviar uma pergunta, <button>faça seu login</button>.
-            </span>
+            {user ? (
+            <div className="user-info">
+                <img src={user.avatar} alt={user.name} />
+                <span>{user.name}</span>
+            </div>) : (
+                <span>
+                Para enviar uma pergunta, <button>faça seu login</button>.
+              </span>
+            )}
             <Button type="submit" disabled={!user}>Enviar pergunta</Button>
           </div>
         </form>
+        {JSON.stringify(questions)}
       </main>
     </div>
   );
