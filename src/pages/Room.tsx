@@ -8,39 +8,18 @@ import "../styles/room.scss";
 import { ref, set, push, get, child, onValue } from "firebase/database";
 import { database } from "../services/firebase";
 import { Question } from "../components/Question";
+import { useRoom } from "../hooks/useRoom";
 
 type RoomParams = {
   id: string;
 };
 
-type FireBaseQuestions = Record<string, {
-    author: {
-    avatar: string;
-    name: string;
-    }
-    content: string;
-    isAnswered: boolean;
-    isHighLighted: boolean;    
-}>
-
-type Question = {
-    id: string;
-    author: {
-        avatar: string;
-        name: string;
-        }
-        content: string;
-        isAnswered: boolean;
-        isHighLighted: boolean;
-
-}
-
 export function Room() {
   const [roomId, setRoomId] = useState("");
   const [newQuestion, setNewQuestion] = useState("");
   const { user } = useAuth();
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [title, setTitle] = useState('');
+  const {title, questions} = useRoom(roomId)
+  
 
   
   // foi necessário virificar antes de o id da sala não é nulo por causa do typescript
@@ -52,27 +31,7 @@ export function Room() {
     return;
   }, [roomId]);
 
-  useEffect(() => {
-      // método para ler dados uma vez com um observador
-         
-     return onValue(ref(database, `rooms/${roomId}`), (snapshot) => {
-        const room = (snapshot.val()) || 'Anonymous';
-        const fireBaseQuestions: FireBaseQuestions = room.questions;
-        //transformar o objeto recebido em array
-        const parsedQuestions = Object.entries(fireBaseQuestions).map(([key, value]) => {
-            return {
-                id: key,
-                content: value.content,
-                author: value.author,
-                isHighLighted: value.isHighLighted,
-                isAnswered: value.isAnswered
-            }
-        })
-        setTitle(room.title);
-        setQuestions(parsedQuestions);
-      });
-         
-  }, [roomId])
+ 
 
   //recebndo o id da sal através da URL
   const params = useParams<RoomParams>();
