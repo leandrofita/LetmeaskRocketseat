@@ -73,7 +73,7 @@ export function Room() {
         setQuestions(parsedQuestions);
       });
          
-  }, [])
+  }, [roomId])
 
   //recebndo o id da sal através da URL
   const params = useParams<RoomParams>();
