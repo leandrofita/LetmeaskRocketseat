@@ -7,6 +7,7 @@ import { useAuth } from "../hooks/useAuth";
 import "../styles/room.scss";
 import { ref, set, push, get, child, onValue } from "firebase/database";
 import { database } from "../services/firebase";
+import { Question } from "../components/Question";
 
 type RoomParams = {
   id: string;
@@ -47,7 +48,6 @@ export function Room() {
   useEffect(() => {
     if (params.id) {
       setRoomId(params.id);
-      console.log(roomId);
     }
     return;
   }, [roomId]);
@@ -58,7 +58,6 @@ export function Room() {
      return onValue(ref(database, `rooms/${roomId}`), (snapshot) => {
         const room = (snapshot.val()) || 'Anonymous';
         const fireBaseQuestions: FireBaseQuestions = room.questions;
-        console.log("Firebasequestions: ", fireBaseQuestions);
         //transformar o objeto recebido em array
         const parsedQuestions = Object.entries(fireBaseQuestions).map(([key, value]) => {
             return {
@@ -149,7 +148,18 @@ export function Room() {
             <Button type="submit" disabled={!user}>Enviar pergunta</Button>
           </div>
         </form>
-        {JSON.stringify(questions)}
+        <div className="question-list">
+        {questions.map(question => {
+          return(
+            <Question
+            key={question.id}
+            content={question.content}
+            author={question.author}
+            />
+          )
+        })}
+
+        </div>
       </main>
     </div>
   );
