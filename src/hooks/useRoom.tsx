@@ -34,6 +34,11 @@ export function useRoom(roomId: string) {
   const [questions, setQuestions] = useState<QuestionType[]>([]);
   const [title, setTitle] = useState("");
 
+  //função para ordenar as perguntas pelo número de likes
+  const compareLikeNumberAndSortByTheBiggest = (a: QuestionType, b: QuestionType) => {
+    return a.likeCount < b.likeCount ? -1 : a.likeCount > b.likeCount ? 1 : 0;
+  };
+
   useEffect(() => {
     // método para ler dados uma vez com um observador       
     onValue(ref(database, `rooms/${roomId}`), (snapshot) => {
@@ -51,8 +56,9 @@ export function useRoom(roomId: string) {
               likeId: Object.entries(value.likes ?? {}).find(([hey, like]) => like.authorId === user?.id)?.[0]
           }
       })
+      const orderQuestions = parsedQuestions.sort(compareLikeNumberAndSortByTheBiggest).reverse()
       setTitle(room.title);
-      setQuestions(parsedQuestions);
+      setQuestions(orderQuestions);
       console.log("Questions:", questions)
     });
     //remoção dos listeners do firebase

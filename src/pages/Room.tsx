@@ -17,7 +17,7 @@ type RoomParams = {
 export function Room() {
   const [roomId, setRoomId] = useState("");
   const [newQuestion, setNewQuestion] = useState("");
-  const { user } = useAuth();
+  const { user, signInWithGoogle } = useAuth();
   const { title, questions } = useRoom(roomId);
 
   //método que adiciona ou remove um like
@@ -103,12 +103,13 @@ export function Room() {
           <div className="form-footer">
             {user ? (
               <div className="user-info">
-                <img src={user.avatar} alt={user.name} />
+                {/* foi necessário acrescentar o atributo referrerPolicy="no-referrer" ao componente de imagam para evitar o 403 do firebase */}
+                <img src={user.avatar} alt={user.name} referrerPolicy="no-referrer" />
                 <span>{user.name}</span>
               </div>
             ) : (
               <span>
-                Para enviar uma pergunta, <button>faça seu login</button>.
+                Para enviar uma pergunta, <button onClick={()=>{signInWithGoogle()}}>faça seu login</button>.
               </span>
             )}
             <Button type="submit" disabled={!user}>
@@ -123,8 +124,11 @@ export function Room() {
                 key={question.id}
                 content={question.content}
                 author={question.author}
+                isAnswered={question.isAnswered}
+                isHighLighted={question.isHighLighted}
               >
-                <button
+               {!question.isAnswered && (
+                  <button
                   className={`like-button ${question.likeId ? 'liked' : ''}`}
                   type="button"
                   aria-label="Marcar como gostei"
@@ -152,6 +156,7 @@ export function Room() {
                     />
                   </svg>
                 </button>
+               )}
               </Question>
             );
           })}
