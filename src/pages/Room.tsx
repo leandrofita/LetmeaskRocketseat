@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import logoImg from "../assets/images/logo.svg";
 import { Button } from "../components/Button";
 import { RoomCode } from "../components/RoomCode";
@@ -19,6 +19,7 @@ export function Room() {
   const [newQuestion, setNewQuestion] = useState("");
   const { user, signInWithGoogle } = useAuth();
   const { title, questions } = useRoom(roomId);
+  const navigate = useNavigate();
 
   //método que adiciona ou remove um like
   async function handleLikeQuestion(questionId: string, likeId: string | undefined) {
@@ -39,7 +40,7 @@ export function Room() {
       });
     }
   }
-  // foi necessário virificar antes de o id da sala não é nulo por causa do typescript
+  // foi necessário virificar antes de se o id da sala não é nulo por causa do typescript
   //o useEffect atualizará a sala sempre que o ID for modificado manualmente
   useEffect(() => {
     if (params.id) {
@@ -80,7 +81,7 @@ export function Room() {
     <div id="page-room">
       <header>
         <div className="content">
-          <img src={logoImg} alt="Letmeask" />
+          <img src={logoImg} alt="Letmeask" onClick={()=>{navigate("/")}} />
           <RoomCode code={roomId} />
         </div>
       </header>

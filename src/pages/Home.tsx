@@ -20,6 +20,7 @@ export function Home() {
   const handleCreateRoom = async () => {
     if (!user) {
       await signInWithGoogle();
+      console.log("ENV", process.env)
     }
     navigate("/rooms/new");
   };

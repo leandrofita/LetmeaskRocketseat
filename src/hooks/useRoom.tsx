@@ -56,9 +56,9 @@ export function useRoom(roomId: string) {
               likeId: Object.entries(value.likes ?? {}).find(([hey, like]) => like.authorId === user?.id)?.[0]
           }
       })
-      const orderQuestions = parsedQuestions.sort(compareLikeNumberAndSortByTheBiggest).reverse()
+      const orderedQuestions = parsedQuestions.sort(compareLikeNumberAndSortByTheBiggest).reverse()
       setTitle(room.title);
-      setQuestions(orderQuestions);
+      setQuestions(orderedQuestions);
       console.log("Questions:", questions)
     });
     //remoção dos listeners do firebase
